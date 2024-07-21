@@ -1,4 +1,4 @@
-use nn_structure::{image::RgbImage, imagecolors::{node_of_depth, BACKGROUND, NODE, SEPERATOR}, imageproc::{drawing::{draw_filled_circle_mut, draw_filled_rect_mut, draw_hollow_circle_mut}, rect::Rect}, Loc, NNStructureVisualize};
+use nn_structure::{image::RgbImage, imagecolors::{node_of_depth, BACKGROUND, SEPERATOR}, imageproc::{drawing::{draw_filled_circle_mut, draw_filled_rect_mut, draw_hollow_circle_mut}, rect::Rect}, NNStructureVisualize};
 
 use crate::{Branch, Node, VpTree};
 
