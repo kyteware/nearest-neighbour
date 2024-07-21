@@ -13,7 +13,7 @@ fn main() {
 
     for (i, (name, image)) in images.iter().enumerate() {
         overlay(&mut master_image, image, 20, 20 + i as i64 * 120);
-        draw_text_mut(&mut master_image, TEXT, 20 + i as i32 * 120, 520, 40., &font, &name);
+        draw_text_mut(&mut master_image, TEXT, 20 + i as i32 * 120, 520, 40., &font, name);
     }
 
     master_image.save("renders/100_scattered_point_comparison.png").unwrap();
