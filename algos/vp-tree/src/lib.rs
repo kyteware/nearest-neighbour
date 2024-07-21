@@ -13,7 +13,7 @@ impl<T> NNStructure<T> for VpTree<T> {
         VpTree { root, elements }
     }
 
-    fn nearest_neighbour<'a>(&'a self, loc: Loc) -> (&'a T, Loc) {
+    fn nearest_neighbour(&self, loc: Loc) -> (&T, Loc) {
         todo!()
     }
 }

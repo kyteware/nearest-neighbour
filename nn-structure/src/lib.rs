@@ -2,7 +2,7 @@ use image::RgbImage;
 
 pub trait NNStructure<T> {
     fn construct(elements: Vec<(Loc, T)>) -> Self;
-    fn nearest_neighbour<'a>(&'a self, loc: Loc) -> (&'a T, Loc);
+    fn nearest_neighbour(&self, loc: Loc) -> (&T, Loc);
 }
 
 pub trait NNStructureVisualize {

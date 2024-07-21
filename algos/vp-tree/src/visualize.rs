@@ -19,9 +19,9 @@ fn draw_node(image: &mut RgbImage, node: &Node, depth: u32) {
         draw_hollow_circle_mut(image, loc, radius.round() as i32, SEPERATOR);
 
         let (inner, outer) = &**inner_outer;
-        draw_node(image, &inner, depth + 1);
+        draw_node(image, inner, depth + 1);
         if let Some(outer) = outer {
-            draw_node(image, &outer, depth + 1);
+            draw_node(image, outer, depth + 1);
         }
     }
 }
