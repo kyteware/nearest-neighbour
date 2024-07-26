@@ -25,38 +25,65 @@ fn main() {
 
     let mut rng = StdRng::seed_from_u64(1000);
 
-    // construction
+    let (construction_1000, construction_10000) = construction_benches(&mut rng);
+    println!("Construction with 1000 nodes:\n{}", construction_1000.formatted());
+    println!("Construction with 10000 nodes:\n{}", construction_10000.formatted());
+
+    let (nn_oneshot_1000, nn_oneshot_10000) = nn_oneshot_benches(&mut rng);
+    println!("Nearest neighbour oneshot with 1000 nodes:\n{}", nn_oneshot_1000.formatted());
+    println!("Nearest neighbour oneshot with 10000 nodes:\n{}", nn_oneshot_10000.formatted());
+}
+
+fn construction_benches(rng: &mut StdRng) -> (Comparison, Comparison) {
     let mut construction_1000s = vec![Comparison::default(); 100];
     for i in 0..100 {
-        let mut nodes = Vec::with_capacity(1000);
-        for _ in 0..1000 {
-            let x = rng.gen_range(-100.0..100.0);
-            let y = rng.gen_range(-100.0..100.0);
-            nodes.push((Loc(x, y), ()))
-        }
+        let nodes = gen_scattered_points(1000, rng);
 
         construction_1000s[i] = Comparison::bench_construction(nodes);
     }
 
     let construction_1000 = avg_comp(&construction_1000s);
 
-    println!("Construction with 1000 nodes:\n{}", construction_1000.formatted());
-
     let mut construction_10000s = vec![Comparison::default(); 100];
     for i in 0..100 {
-        let mut nodes = Vec::with_capacity(10000);
-        for _ in 0..10000 {
-            let x = rng.gen_range(-100.0..100.0);
-            let y = rng.gen_range(-100.0..100.0);
-            nodes.push((Loc(x, y), ()))
-        }
+        let nodes = gen_scattered_points(10000, rng);
 
         construction_10000s[i] = Comparison::bench_construction(nodes);
     }
 
     let construction_10000 = avg_comp(&construction_10000s);
 
-    println!("Construction with 10000 nodes:\n{}", construction_10000.formatted());
+    (construction_1000, construction_10000)
+}
+
+fn nn_oneshot_benches(rng: &mut StdRng) -> (Comparison, Comparison) {
+    let mut nn_oneshot_1000s = vec![Comparison::default(); 100];
+    for i in 0..100 {
+        let nodes = gen_scattered_points(1000, rng);
+
+        let x = rng.gen_range(-100.0..100.0);
+        let y = rng.gen_range(-100.0..100.0);
+        let target = Loc(x, y);
+
+        nn_oneshot_1000s[i] = Comparison::bench_nn_oneshot(nodes, target);
+    }
+
+    let nn_oneshot_1000 = avg_comp(&nn_oneshot_1000s);
+
+    let mut nn_oneshot_10000s = vec![Comparison::default(); 100];
+    for i in 0..100 {
+        let nodes = gen_scattered_points(10000, rng);
+
+        let x = rng.gen_range(-100.0..100.0);
+        let y = rng.gen_range(-100.0..100.0);
+        let target = Loc(x, y);
+
+        nn_oneshot_10000s[i] = Comparison::bench_nn_oneshot(nodes, target);
+    }
+
+    let nn_oneshot_10000 = avg_comp(&nn_oneshot_10000s);
+
+    (nn_oneshot_1000, nn_oneshot_10000)
 }
 
 const NUM_ALGORITHMS: usize = 2;
@@ -77,13 +104,23 @@ impl Comparison {
         Self { times }
     }
 
+    fn bench_nn_oneshot(nodes: Vec<(Loc, ())>, target: Loc) -> Self {
+        let mut times: [Option<f64>; NUM_ALGORITHMS] = Default::default();
+        let basic_list = BasicList::construct(nodes.clone());
+        times[0] = Some(black_box(bench_function2(BasicList::nearest_neighbour, &basic_list, target)));
+        let vp_tree = VpTree::construct(nodes.clone());
+        times[1] = Some(black_box(bench_function2(VpTree::nearest_neighbour, &vp_tree, target)));
+
+        Self { times }
+    }
+
     fn formatted(&self) -> String {
         let mut res = String::new();
         if let Some(time) = self.times[0] {
-            res.push_str(&format!("Basic list:         {:.2}ms\n", time * 1000.));
+            res.push_str(&format!("Basic list:         {:.4}ms\n", time * 1000.));
         }
         if let Some(time) = self.times[1] {
-            res.push_str(&format!("Vantage Point Tree: {:.2}ms\n", time * 1000.));
+            res.push_str(&format!("Vantage Point Tree: {:.4}ms\n", time * 1000.));
         }
         res
     }
@@ -106,9 +143,28 @@ fn avg_comp(comps: &[Comparison]) -> Comparison {
     Comparison { times: avg_times }
 }
 
+fn gen_scattered_points(num: usize, rng: &mut StdRng) -> Vec<(Loc, ())> {
+    let mut nodes = Vec::with_capacity(num);
+    for _ in 0..num {
+        let x = rng.gen_range(-100.0..100.0);
+        let y = rng.gen_range(-100.0..100.0);
+        nodes.push((Loc(x, y), ()))
+    }
+
+    nodes
+}
+
 fn bench_function<I, O>(f: impl FnOnce(I) -> O, input: I) -> f64 {
     let start = Instant::now();
     black_box(f(black_box(input)));
+    let end = Instant::now();
+
+    end.duration_since(start).as_secs_f64()
+}
+
+fn bench_function2<I1, I2, O>(f: impl FnOnce(I1, I2) -> O, i1: I1, i2: I2) -> f64 {
+    let start = Instant::now();
+    black_box(f(black_box(i1), black_box(i2)));
     let end = Instant::now();
 
     end.duration_since(start).as_secs_f64()
