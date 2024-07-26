@@ -1,0 +1,19 @@
+[package]
+name = "benchmarks"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+nn-structure = { path = "../nn-structure" }
+rand = "0.8.5"
+vp-tree = { path = "../algos/vp-tree" }
+
+[[bin]]
+name = "bench"
+test = false
+bench = false
+
+[[bin]]
+name = "chart"
+test = false
+bench = false
