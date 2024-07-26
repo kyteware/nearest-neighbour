@@ -1,5 +1,6 @@
 use std::{hint::black_box, time::Instant};
 
+use basic_list::BasicList;
 use nn_structure::{Loc, NNStructure};
 use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
 use vp_tree::VpTree;
@@ -58,8 +59,9 @@ fn main() {
     println!("Construction with 10000 nodes:\n{}", construction_10000.formatted());
 }
 
-const NUM_ALGORITHMS: usize = 1;
+const NUM_ALGORITHMS: usize = 2;
 
+/// Basic list: 0
 /// VP-Tree: 1
 #[derive(Clone, Debug, Default)]
 struct Comparison {
@@ -69,7 +71,8 @@ struct Comparison {
 impl Comparison {
     fn bench_construction(nodes: Vec<(Loc, ())>) -> Self {
         let mut times: [Option<f64>; NUM_ALGORITHMS] = Default::default();
-        times[0] = Some(black_box(bench_function(VpTree::construct, nodes.clone())));
+        times[0] = Some(black_box(bench_function(BasicList::construct, nodes.clone())));
+        times[1] = Some(black_box(bench_function(VpTree::construct, nodes.clone())));
 
         Self { times }
     }
@@ -77,6 +80,9 @@ impl Comparison {
     fn formatted(&self) -> String {
         let mut res = String::new();
         if let Some(time) = self.times[0] {
+            res.push_str(&format!("Basic list:         {:.2}ms\n", time * 1000.));
+        }
+        if let Some(time) = self.times[1] {
             res.push_str(&format!("Vantage Point Tree: {:.2}ms\n", time * 1000.));
         }
         res

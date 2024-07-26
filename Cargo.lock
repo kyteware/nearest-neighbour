@@ -98,9 +98,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "basic-list"
+version = "0.1.0"
+dependencies = [
+ "nn-structure",
+]
+
+[[package]]
 name = "benchmarks"
 version = "0.1.0"
 dependencies = [
+ "basic-list",
  "nn-structure",
  "rand",
  "vp-tree",

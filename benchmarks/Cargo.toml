@@ -7,6 +7,7 @@ edition = "2021"
 nn-structure = { path = "../nn-structure" }
 rand = "0.8.5"
 vp-tree = { path = "../algos/vp-tree" }
+basic-list = { path = "../algos/basic-list" }
 
 [[bin]]
 name = "bench"

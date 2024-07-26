@@ -1,3 +1,3 @@
 [workspace]
 resolver = "2"
-members = [ "algos/vp-tree", "benchmarks", "nn-structure", "visualizer"]
+members = [ "algos/basic-list", "algos/vp-tree", "benchmarks", "nn-structure", "visualizer"]

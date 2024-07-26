@@ -1,7 +1,7 @@
 use nn_structure::{Loc, NNStructure};
 pub mod visualize;
 
-#[derive(Debug, )]
+#[derive(Debug)]
 pub struct VpTree<T> {
     pub(crate) root: Node,
     elements: Vec<(Loc, T)>
