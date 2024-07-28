@@ -25,16 +25,18 @@ fn main() {
 
     let mut rng = StdRng::seed_from_u64(1000);
 
-    let (construction_1000, construction_10000) = construction_benches(&mut rng);
+    let (construction_1000, construction_10000, construction_100000) = construction_benches(&mut rng);
     println!("Construction with 1000 nodes:\n{}", construction_1000.formatted());
     println!("Construction with 10000 nodes:\n{}", construction_10000.formatted());
+    println!("Construction with 100000 nodes:\n{}", construction_100000.formatted());
 
-    let (nn_oneshot_1000, nn_oneshot_10000) = nn_oneshot_benches(&mut rng);
+    let (nn_oneshot_1000, nn_oneshot_10000, nn_oneshot_100000) = nn_oneshot_benches(&mut rng);
     println!("Nearest neighbour oneshot with 1000 nodes:\n{}", nn_oneshot_1000.formatted());
     println!("Nearest neighbour oneshot with 10000 nodes:\n{}", nn_oneshot_10000.formatted());
+    println!("Nearest neighbour oneshot with 100000 nodes:\n{}", nn_oneshot_100000.formatted());
 }
 
-fn construction_benches(rng: &mut StdRng) -> (Comparison, Comparison) {
+fn construction_benches(rng: &mut StdRng) -> (Comparison, Comparison, Comparison) {
     let mut construction_1000s = vec![Comparison::default(); 100];
     for i in 0..100 {
         let nodes = gen_scattered_points(1000, rng);
@@ -53,10 +55,19 @@ fn construction_benches(rng: &mut StdRng) -> (Comparison, Comparison) {
 
     let construction_10000 = avg_comp(&construction_10000s);
 
-    (construction_1000, construction_10000)
+    let mut construction_100000s = vec![Comparison::default(); 100];
+    for i in 0..100 {
+        let nodes = gen_scattered_points(100000, rng);
+
+        construction_100000s[i] = Comparison::bench_construction(nodes);
+    }
+
+    let construction_100000 = avg_comp(&construction_100000s);
+
+    (construction_1000, construction_10000, construction_100000)
 }
 
-fn nn_oneshot_benches(rng: &mut StdRng) -> (Comparison, Comparison) {
+fn nn_oneshot_benches(rng: &mut StdRng) -> (Comparison, Comparison, Comparison) {
     let mut nn_oneshot_1000s = vec![Comparison::default(); 100];
     for i in 0..100 {
         let nodes = gen_scattered_points(1000, rng);
@@ -83,7 +94,20 @@ fn nn_oneshot_benches(rng: &mut StdRng) -> (Comparison, Comparison) {
 
     let nn_oneshot_10000 = avg_comp(&nn_oneshot_10000s);
 
-    (nn_oneshot_1000, nn_oneshot_10000)
+    let mut nn_oneshot_100000s = vec![Comparison::default(); 100];
+    for i in 0..100 {
+        let nodes = gen_scattered_points(100000, rng);
+
+        let x = rng.gen_range(-100.0..100.0);
+        let y = rng.gen_range(-100.0..100.0);
+        let target = Loc(x, y);
+
+        nn_oneshot_100000s[i] = Comparison::bench_nn_oneshot(nodes, target);
+    }
+
+    let nn_oneshot_100000 = avg_comp(&nn_oneshot_100000s);
+
+    (nn_oneshot_1000, nn_oneshot_10000, nn_oneshot_100000)
 }
 
 const NUM_ALGORITHMS: usize = 2;
